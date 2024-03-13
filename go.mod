@@ -1,3 +1,3 @@
-module github.com/msetsma/CMM-Executor
+module github.com/msetsma/cmm-executor
 
 go 1.22.1

@@ -14,7 +14,7 @@
 To install `cmm_executor`, run the following command in your terminal:
 
 ```bash
-go get github.com/msetsma/CMM-Executor
+go get github.com/msetsma/cmm_executor
 ```
 
 ## Usage
