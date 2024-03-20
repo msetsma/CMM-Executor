@@ -88,7 +88,6 @@ func isExecutableInPath(executable string) bool {
 	return false
 }
 
-
 func (e Executor) SetValue(monitor, VCPCode, value string) error {
 	_, err := e.commandExecutor.Execute([]string{setValue, monitor, VCPCode, value})
 	return err
@@ -100,8 +99,11 @@ func (e Executor) SetValueIfNeeded(monitor, VCPCode, value string) error {
 }
 
 func (e Executor) GetValue(monitor, VCPCode string) (string, error) {
-	output, err := e.commandExecutor.Execute([]string{getValue, monitor, VCPCode})
-	return output, err
+	_, err := e.commandExecutor.Execute([]string{getValue, monitor, VCPCode})
+	if err != nil {
+		return "", err
+	}
+	return e.commandExecutor.Execute([]string{"echo", "$LASTEXITCODE"})
 }
 
 func (e Executor) TurnOff(monitor string) error {
@@ -119,6 +121,13 @@ func (e Executor) SwitchOffOn(monitor string) error {
 	return err
 }
 
+func (e Executor) SwitchValue(monitor string, VCPCode string, values []string) error {
+	command := []string{switchValue, monitor, VCPCode}
+	command = append(command, values...)
+	_, err := e.commandExecutor.Execute(command)
+	return err
+}
+
 func (e Executor) SaveConfig(filename, monitor string) error {
 	_, err := e.commandExecutor.Execute([]string{saveConfig, filename, monitor})
 	return err
@@ -131,11 +140,12 @@ func (e Executor) LoadConfig(filename, monitor string) error {
 
 // Generalized Execute Function
 func (e Executor) executeCommand(command []string, returnContents bool) (string, error) {
-    output, err := e.commandExecutor.Execute(command)
     if returnContents {
-        return output, err
+		// set filename to ""
+		command[1] = "\"\""
+		command = append(command, "|", "more")
     }
-    return "", err
+    return e.commandExecutor.Execute(command)
 }
 
 func (e Executor) SText(filename string, monitor string, returnContents bool) (string, error) {
