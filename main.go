@@ -99,8 +99,11 @@ func (e Executor) SetValueIfNeeded(monitor, VCPCode, value string) error {
 }
 
 func (e Executor) GetValue(monitor, VCPCode string) (string, error) {
-	output, err := e.commandExecutor.Execute([]string{getValue, monitor, VCPCode})
-	return output, err
+	_, err := e.commandExecutor.Execute([]string{getValue, monitor, VCPCode})
+	if err != nil {
+		return "", err
+	}
+	return e.commandExecutor.Execute([]string{"echo", "$LASTEXITCODE"})
 }
 
 func (e Executor) TurnOff(monitor string) error {
@@ -118,6 +121,13 @@ func (e Executor) SwitchOffOn(monitor string) error {
 	return err
 }
 
+func (e Executor) SwitchValue(monitor string, VCPCode string, values []string) error {
+	command := []string{switchValue, monitor, VCPCode}
+	command = append(command, values...)
+	_, err := e.commandExecutor.Execute(command)
+	return err
+}
+
 func (e Executor) SaveConfig(filename, monitor string) error {
 	_, err := e.commandExecutor.Execute([]string{saveConfig, filename, monitor})
 	return err
@@ -128,42 +138,44 @@ func (e Executor) LoadConfig(filename, monitor string) error {
 	return err
 }
 
-func (e Executor) SText(filename, monitor string) error {
-	_, err := e.commandExecutor.Execute([]string{sText, filename, monitor})
-	return err
+// Generalized Execute Function
+func (e Executor) executeCommand(command []string, returnContents bool) (string, error) {
+    if returnContents {
+		// set filename to ""
+		command[1] = "\"\""
+		command = append(command, "|", "more")
+    }
+    return e.commandExecutor.Execute(command)
 }
 
-func (e Executor) STab(filename, monitor string) error {
-	_, err := e.commandExecutor.Execute([]string{sTab, filename, monitor})
-	return err
+func (e Executor) SText(filename string, monitor string, returnContents bool) (string, error) {
+    return e.executeCommand([]string{sText, filename, monitor}, returnContents)
 }
 
-func (e Executor) SComma(filename, monitor string) error {
-	_, err := e.commandExecutor.Execute([]string{sComma, filename, monitor})
-	return err
+func (e Executor) STab(filename string, monitor string, returnContents bool) (string, error) {
+	return e.executeCommand([]string{sTab, filename, monitor}, returnContents)
 }
 
-func (e Executor) SHtml(filename, monitor string) error {
-	_, err := e.commandExecutor.Execute([]string{sHtml, filename, monitor})
-	return err
+func (e Executor) SComma(filename string, monitor string, returnContents bool) (string, error) {
+	return e.executeCommand([]string{sComma, filename, monitor}, returnContents)
 }
 
-func (e Executor) SVerHtml(filename, monitor string) error {
-	_, err := e.commandExecutor.Execute([]string{sVerHtml, filename, monitor})
-	return err
+func (e Executor) SHtml(filename string, monitor string, returnContents bool) (string, error) {
+	return e.executeCommand([]string{sHtml, filename, monitor}, returnContents)
 }
 
-func (e Executor) SXml(filename, monitor string) error {
-	_, err := e.commandExecutor.Execute([]string{sXml, filename, monitor})
-	return err
+func (e Executor) SVerHtml(filename string, monitor string, returnContents bool) (string, error) {
+	return e.executeCommand([]string{sVerHtml, filename, monitor}, returnContents)
 }
 
-func (e Executor) SJson(filename, monitor string) error {
-	_, err := e.commandExecutor.Execute([]string{sJson, filename, monitor})
-	return err
+func (e Executor) SXml(filename string, monitor string, returnContents bool) (string, error) {
+	return e.executeCommand([]string{sXml, filename, monitor}, returnContents)
 }
 
-func (e Executor) SMonitors(filename string) error {
-	_, err := e.commandExecutor.Execute([]string{sMonitors, filename})
-	return err
+func (e Executor) SJson(filename string, monitor string, returnContents bool) (string, error) {
+	return e.executeCommand([]string{sJson, filename, monitor}, returnContents)
+}
+
+func (e Executor) SMonitors(filename string, returnContents bool) (string, error) {
+	return e.executeCommand([]string{sMonitors, filename}, returnContents)
 }
