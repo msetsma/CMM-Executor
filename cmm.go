@@ -1,4 +1,4 @@
-package cmm_executor
+package cmm
 
 import (
 	"bytes"
@@ -58,7 +58,6 @@ func (sce *systemCommandExecutor) Execute(args []string) (string, error) {
 	}
 	return out.String(), nil
 }
-
 
 // Constructor for executor
 func ControlMyMonitor(executable string) (*Executor, error) {

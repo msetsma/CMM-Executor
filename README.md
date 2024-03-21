@@ -14,7 +14,7 @@
 To install `cmm_executor`, run the following command in your terminal:
 
 ```bash
-go get github.com/msetsma/cmm_executor
+go get github.com/msetsma/cmm_executor@latest
 ```
 
 ## Usage
@@ -22,7 +22,9 @@ go get github.com/msetsma/cmm_executor
 Import `cmm_executor` into your Go project:
 
 ```go
-import "cmm_executor"
+import (
+    "github.com/msetsma/cmm_executor/cmm"
+)
 ```
 
 ### Creating an Executor
@@ -30,7 +32,8 @@ import "cmm_executor"
 To use the package, you must first create an `Executor` instance by providing the path to the ControlMyMonitor executable:
 
 ```go
-executor, err := cmm_executor.ControlMyMonitor("ControlMyMonitor.exe")
+excutableName := "ControlMyMonitor.exe"
+executor, err := cmm.ControlMyMonitor(excutableName)
 if err != nil {
     log.Fatalf("Failed to create executor: %v", err)
 }
